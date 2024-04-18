@@ -4,7 +4,7 @@ WORKDIR /var/www/html
 
 ENV NGINX_VERSION 1.25.0
 ENV MORE_SET_HEADER_VERSION 0.34
-ENV FANCYINDEX 0.5.2
+ENV FANCYINDEX master
 
 RUN mkdir -p /var/www/html \
     && GPG_KEYS=13C82A63B603576156E30A4EA0EA981B66B0D967 \
@@ -76,8 +76,10 @@ RUN mkdir -p /var/www/html \
     && git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git /tmp/ngx_http_substitutions_filter_module \
     && curl -sfSL https://github.com/openresty/headers-more-nginx-module/archive/v$MORE_SET_HEADER_VERSION.tar.gz -o $MORE_SET_HEADER_VERSION.tar.gz \
     && tar xvf $MORE_SET_HEADER_VERSION.tar.gz \
-    && curl -sfSL https://github.com/aperezdc/ngx-fancyindex/releases/download/v$FANCYINDEX/ngx-fancyindex-$FANCYINDEX.tar.xz -o fancyindex.tar.xz \
-    && tar xvf fancyindex.tar.xz \
+    && curl -sfSL https://github.com/foghawk/ngx-fancyindex/archive/refs/heads/master.zip -o fancyindex.zip \
+    && unzip fancyindex.zip \
+    && curl -sfSL https://github.com/sourcefrog/natsort/archive/refs/heads/master.zip -o natsort.zip \
+    && unzip -j -o natsort.zip -d ngx-fancyindex-$FANCYINDEX \
     && curl -sfSL https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz -o nginx.tar.gz \
     && curl -sfSL https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz.asc  -o nginx.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -145,9 +147,10 @@ RUN mkdir -p /var/www/html \
     && mv /tmp/envsubst /usr/local/bin/ \
     && rm /tmp/$MORE_SET_HEADER_VERSION.tar.gz \
     && rm -rf /tmp/headers-more-nginx-module-$MORE_SET_HEADER_VERSION \
-    && rm /tmp/fancyindex.tar.xz \
+    && rm /tmp/fancyindex.zip \
     && rm -rf /tmp/ngx-fancyindex-$FANCYINDEX \
     && rm -rf /tmp/ngx_http_substitutions_filter_module \
+    && rm /tmp/natsort.zip \
     && rm -rf /tmp/pear \
     \
     # forward request and error logs to docker log collector
