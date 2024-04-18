@@ -1,4 +1,4 @@
-FROM alpine:3.14
+FROM alpine:3.15
 
 MAINTAINER Joao Gilberto Magalhaes
 
@@ -6,7 +6,7 @@ WORKDIR /var/www/html
 
 ENV NGINX_VERSION 1.21.1
 ENV MORE_SET_HEADER_VERSION 0.33
-ENV FANCYINDEX 0.5.1
+ENV FANCYINDEX master
 
 RUN mkdir -p /var/www/html \
     && GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
@@ -75,8 +75,10 @@ RUN mkdir -p /var/www/html \
     && cd /tmp/ \
     && curl -sfSL https://github.com/openresty/headers-more-nginx-module/archive/v$MORE_SET_HEADER_VERSION.tar.gz -o $MORE_SET_HEADER_VERSION.tar.gz \
     && tar xvf $MORE_SET_HEADER_VERSION.tar.gz \
-    && curl -sfSL https://github.com/aperezdc/ngx-fancyindex/releases/download/v$FANCYINDEX/ngx-fancyindex-$FANCYINDEX.tar.xz -o fancyindex.tar.xz \
-    && tar xvf fancyindex.tar.xz \
+    && curl -sfSL https://github.com/foghawk/ngx-fancyindex/archive/refs/heads/master.zip -o fancyindex.zip \
+    && unzip fancyindex.zip \
+    && curl -sfSL https://github.com/sourcefrog/natsort/archive/refs/heads/master.zip -o natsort.zip \
+    && unzip -j -o natsort.zip -d ngx-fancyindex-$FANCYINDEX \
     && curl -sfSL https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz -o nginx.tar.gz \
     && curl -sfSL https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz.asc  -o nginx.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -144,8 +146,9 @@ RUN mkdir -p /var/www/html \
     && mv /tmp/envsubst /usr/local/bin/ \
     && rm /tmp/$MORE_SET_HEADER_VERSION.tar.gz \
     && rm -rf /tmp/headers-more-nginx-module-$MORE_SET_HEADER_VERSION \
-    && rm /tmp/fancyindex.tar.xz \
+    && rm /tmp/fancyindex.zip \
     && rm -rf /tmp/ngx-fancyindex-$FANCYINDEX \
+    && rm /tmp/natsort.zip \
     && rm -rf /tmp/pear \
     \
     # forward request and error logs to docker log collector
